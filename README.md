@@ -18,6 +18,12 @@ This is a template for creating a custom registry using Next.js.
 - Every registry item are compatible with the `shadcn` CLI.
 - We have also added v0 integration using the `Open in v0` api.
 
+## About component and registry
+- UI page can be accessed at root `/`.
+- Registry is served as static files under `/r/complex-component.json`.
+- Registry component, hook, and lib files are stored in `/registry/new-york/blocks/complex-component/`.
+- Install the component via CLI using `shadcn add` command.
+
 ## Documentation
 
 Visit the [shadcn documentation](https://ui.shadcn.com/docs/registry) to view the full documentation.
