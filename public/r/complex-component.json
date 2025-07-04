@@ -10,28 +10,23 @@
   "files": [
     {
       "path": "registry/new-york/blocks/complex-component/page.tsx",
-      "content": "import { cache } from \"react\"\nimport { PokemonCard } from \"@/registry/new-york/blocks/complex-component/components/pokemon-card\"\nimport { getPokemonList } from \"@/registry/new-york/blocks/complex-component/lib/pokemon\"\nconst getCachedPokemonList = cache(getPokemonList)\n\nexport default async function Page() {\n  const pokemons = await getCachedPokemonList({ limit: 12 })\n\n  if (!pokemons) {\n    return null\n  }\n\n  return (\n    <div className=\"mx-auto w-full max-w-2xl px-4\">\n      <div className=\"grid grid-cols-2 gap-4 py-10 sm:grid-cols-3 md:grid-cols-4\">\n        {pokemons.results.map((p) => (\n          <PokemonCard key={p.name} name={p.name} />\n        ))}\n      </div>\n    </div>\n  )\n}\n",
+      "content": "import { BlockNumberDisplay } from \"./components/block-number-display\";\n\nexport default function Page() {\n  return (\n    <div className=\"mx-auto w-full max-w-2xl px-4\">\n      <div className=\"grid grid-cols-2 gap-4 py-10 sm:grid-cols-3 md:grid-cols-4\">\n        <BlockNumberDisplay />\n      </div>\n    </div>\n  )\n}\n",
       "type": "registry:page",
-      "target": "app/pokemon/page.tsx"
+      "target": "app/block-number/page.tsx"
     },
     {
-      "path": "registry/new-york/blocks/complex-component/components/pokemon-card.tsx",
-      "content": "import { cache } from \"react\"\nimport { getPokemon } from \"@/registry/new-york/blocks/complex-component/lib/pokemon\"\nimport { Card, CardContent } from \"@/registry/new-york/ui/card\"\nimport { PokemonImage } from \"@/registry/new-york/blocks/complex-component/components/pokemon-image\"\n\nconst cachedGetPokemon = cache(getPokemon)\n\nexport async function PokemonCard({ name }: { name: string }) {\n  const pokemon = await cachedGetPokemon(name)\n\n  if (!pokemon) {\n    return null\n  }\n\n  return (\n    <Card>\n      <CardContent className=\"flex flex-col items-center p-2\">\n        <div>\n          <PokemonImage name={pokemon.name} number={pokemon.id} />\n        </div>\n        <div className=\"text-center font-medium\">{pokemon.name}</div>\n      </CardContent>\n    </Card>\n  )\n}\n",
+      "path": "registry/new-york/blocks/complex-component/components/block-number-display.tsx",
+      "content": "\"use client\"\n\nimport { useEffect } from \"react\";\nimport { useBlockNumber } from \"../hooks/use-block-number\"\n\n\nexport function BlockNumberDisplay() {\n  const { blockNumber, fetchBlockNumber, unsub } = useBlockNumber();\n\n  useEffect(() => {\n    fetchBlockNumber();\n\n    return () => {\n      unsub?.();\n    };\n  }, []);\n\n  return (\n    <p>Block number: {!!blockNumber ? blockNumber : \"Loading...\"}</p>\n  )\n}\n",
       "type": "registry:component"
     },
     {
-      "path": "registry/new-york/blocks/complex-component/components/pokemon-image.tsx",
-      "content": "\"use client\"\n\n/* eslint-disable @next/next/no-img-element */\nimport { usePokemonImage } from \"@/registry/new-york/blocks/complex-component/hooks/use-pokemon\"\n\nexport function PokemonImage({\n  name,\n  number,\n}: {\n  name: string\n  number: number\n}) {\n  const imageUrl = usePokemonImage(number)\n\n  if (!imageUrl) {\n    return null\n  }\n\n  return <img src={imageUrl} alt={name} />\n}\n",
-      "type": "registry:component"
-    },
-    {
-      "path": "registry/new-york/blocks/complex-component/lib/pokemon.ts",
-      "content": "import { z } from \"zod\"\n\nexport async function getPokemonList({ limit = 10 }: { limit?: number }) {\n  try {\n    const response = await fetch(\n      `https://pokeapi.co/api/v2/pokemon?limit=${limit}`\n    )\n    return z\n      .object({\n        results: z.array(z.object({ name: z.string() })),\n      })\n      .parse(await response.json())\n  } catch (error) {\n    console.error(error)\n    return null\n  }\n}\n\nexport async function getPokemon(name: string) {\n  try {\n    const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`)\n\n    if (!response.ok) {\n      throw new Error(\"Failed to fetch pokemon\")\n    }\n\n    return z\n      .object({\n        name: z.string(),\n        id: z.number(),\n        sprites: z.object({\n          front_default: z.string(),\n        }),\n        stats: z.array(\n          z.object({\n            base_stat: z.number(),\n            stat: z.object({\n              name: z.string(),\n            }),\n          })\n        ),\n      })\n      .parse(await response.json())\n  } catch (error) {\n    console.error(error)\n    return null\n  }\n}\n",
+      "path": "registry/new-york/blocks/complex-component/lib/block-number.ts",
+      "content": "import { DedotClient, WsProvider } from 'dedot';\nimport type { PolkadotApi } from '@dedot/chaintypes';\n\n// Initialize providers & clients\nconst provider = new WsProvider('wss://rpc.polkadot.io');\nconst client = await DedotClient.new<PolkadotApi>(provider);\n\ntype BlockNumberProps = {\n    unsub: () => void;\n    blockNumber: number;\n}\n\nexport async function getBlockNumber(onBlockNumberUpdate?: (blockNumber: number) => void): Promise<BlockNumberProps | null> {\n    try {\n        const currentBlockNumber = await client.query.system.number();\n        \n        const unsub = await client.query.system.number((blockNumber) => {\n            if (onBlockNumberUpdate) {\n                onBlockNumberUpdate(blockNumber);\n            }\n        });\n        \n        return {\n            unsub,\n            blockNumber: currentBlockNumber\n        };\n    } catch (error) {\n        console.error(error);\n        return null;\n    }\n}",
       "type": "registry:lib"
     },
     {
-      "path": "registry/new-york/blocks/complex-component/hooks/use-pokemon.ts",
-      "content": "\"use client\"\n\n// Totally unnecessary hook, but it's a good example of how to use a hook in a custom registry.\n\nexport function usePokemonImage(number: number) {\n  return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${number}.png`\n}\n",
+      "path": "registry/new-york/blocks/complex-component/hooks/use-block-number.ts",
+      "content": "\"use client\"\n\nimport { useCallback, useState } from \"react\";\nimport { getBlockNumber } from \"../lib/block-number\";\n\nexport function useBlockNumber() {\n    const [blockNumber, setBlockNumber] = useState(0);\n    const [unsub, setUnsub] = useState<(() => void) | null>(null);\n\n    const fetchBlockNumber = useCallback(async () => {\n        try {\n            const resp = await getBlockNumber((newBlockNumber) => {\n                setBlockNumber(newBlockNumber);\n            });\n\n            if (!resp) {\n                return;\n            }\n            setBlockNumber(resp.blockNumber);\n            setUnsub(() => resp.unsub);\n        } catch {\n            setBlockNumber(0);\n        }\n    }, [])\n\n    return {\n        blockNumber,\n        fetchBlockNumber,\n        unsub\n    };\n}",
       "type": "registry:hook"
     }
   ]

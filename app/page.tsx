@@ -1,9 +1,5 @@
 import * as React from "react"
-import { OpenInV0Button } from "@/components/open-in-v0-button"
-import { HelloWorld } from "@/registry/new-york/blocks/hello-world/hello-world"
-import { ExampleForm } from "@/registry/new-york/blocks/example-form/example-form"
-import PokemonPage from "@/registry/new-york/blocks/complex-component/page"
-import { ExampleCard } from "@/registry/new-york/blocks/example-with-css/example-card"
+import BlockNumberPage from "@/registry/new-york/blocks/complex-component/page"
 // This page displays items from the custom registry.
 // You are free to implement this with your own design as needed.
 
@@ -24,7 +20,7 @@ export default function Home() {
             </h2>
           </div>
           <div className="flex items-center justify-center min-h-[400px] relative">
-            <PokemonPage />
+            <BlockNumberPage />
           </div>
         </div>
       </main>
