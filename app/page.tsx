@@ -1,5 +1,6 @@
 import * as React from "react"
 import BlockNumberPage from "@/registry/new-york/blocks/complex-component/page"
+import { OpenInV0Button } from "@/components/open-in-v0-button"
 // This page displays items from the custom registry.
 // You are free to implement this with your own design as needed.
 
@@ -18,6 +19,7 @@ export default function Home() {
             <h2 className="text-sm text-muted-foreground sm:pl-3">
               A complex component showing hooks, libs and components.
             </h2>
+            <OpenInV0Button name="complex-component"/>
           </div>
           <div className="flex items-center justify-center min-h-[400px] relative">
             <BlockNumberPage />
