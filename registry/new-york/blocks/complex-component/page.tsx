@@ -1,4 +1,4 @@
-import { BlockNumberDisplay } from "@/components/block-number-display";
+import { BlockNumberDisplay } from "@/registry/new-york/blocks/complex-component/components/block-number-display";
 
 export default function Page() {
   return (

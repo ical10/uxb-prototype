@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useState } from "react";
-import { getBlockNumber } from "../lib/block-number";
+import { getBlockNumber } from "@/registry/new-york/blocks/complex-component/lib/block-number";
 
 export function useBlockNumber() {
     const [blockNumber, setBlockNumber] = useState(0);

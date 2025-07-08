@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect } from "react";
-import { useBlockNumber } from "../hooks/use-block-number"
+import { useBlockNumber } from "@/registry/new-york/blocks/complex-component/hooks/use-block-number"
 
 
 export function BlockNumberDisplay() {
