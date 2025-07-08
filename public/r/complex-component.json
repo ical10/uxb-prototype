@@ -10,13 +10,13 @@
   "files": [
     {
       "path": "registry/new-york/blocks/complex-component/page.tsx",
-      "content": "import { BlockNumberDisplay } from \"./components/block-number-display\";\n\nexport default function Page() {\n  return (\n    <div className=\"mx-auto w-full max-w-2xl px-4\">\n      <div className=\"grid grid-cols-2 gap-4 py-10 sm:grid-cols-3 md:grid-cols-4\">\n        <BlockNumberDisplay />\n      </div>\n    </div>\n  )\n}\n",
+      "content": "import { BlockNumberDisplay } from \"@/registry/new-york/blocks/complex-component/components/block-number-display\";\n\nexport default function Page() {\n  return (\n    <div className=\"mx-auto w-full max-w-2xl px-4\">\n      <div className=\"grid grid-cols-2 gap-4 py-10 sm:grid-cols-3 md:grid-cols-4\">\n        <BlockNumberDisplay />\n      </div>\n    </div>\n  )\n}\n",
       "type": "registry:page",
       "target": "app/block-number/page.tsx"
     },
     {
       "path": "registry/new-york/blocks/complex-component/components/block-number-display.tsx",
-      "content": "\"use client\"\n\nimport { useEffect } from \"react\";\nimport { useBlockNumber } from \"../hooks/use-block-number\"\n\n\nexport function BlockNumberDisplay() {\n  const { blockNumber, fetchBlockNumber, unsub } = useBlockNumber();\n\n  useEffect(() => {\n    fetchBlockNumber();\n\n    return () => {\n      unsub?.();\n    };\n  }, []);\n\n  return (\n    <p>Block number: {!!blockNumber ? blockNumber : \"Loading...\"}</p>\n  )\n}\n",
+      "content": "\"use client\"\n\nimport { useEffect } from \"react\";\nimport { useBlockNumber } from \"@/registry/new-york/blocks/complex-component/hooks/use-block-number\"\n\n\nexport function BlockNumberDisplay() {\n  const { blockNumber, fetchBlockNumber, unsub } = useBlockNumber();\n\n  useEffect(() => {\n    fetchBlockNumber();\n\n    return () => {\n      unsub?.();\n    };\n  }, []);\n\n  return (\n    <p>Block number: {!!blockNumber ? blockNumber : \"Loading...\"}</p>\n  )\n}\n",
       "type": "registry:component"
     },
     {
@@ -26,7 +26,7 @@
     },
     {
       "path": "registry/new-york/blocks/complex-component/hooks/use-block-number.ts",
-      "content": "\"use client\"\n\nimport { useCallback, useState } from \"react\";\nimport { getBlockNumber } from \"../lib/block-number\";\n\nexport function useBlockNumber() {\n    const [blockNumber, setBlockNumber] = useState(0);\n    const [unsub, setUnsub] = useState<(() => void) | null>(null);\n\n    const fetchBlockNumber = useCallback(async () => {\n        try {\n            const resp = await getBlockNumber((newBlockNumber) => {\n                setBlockNumber(newBlockNumber);\n            });\n\n            if (!resp) {\n                return;\n            }\n            setBlockNumber(resp.blockNumber);\n            setUnsub(() => resp.unsub);\n        } catch {\n            setBlockNumber(0);\n        }\n    }, [])\n\n    return {\n        blockNumber,\n        fetchBlockNumber,\n        unsub\n    };\n}",
+      "content": "\"use client\"\n\nimport { useCallback, useState } from \"react\";\nimport { getBlockNumber } from \"@/registry/new-york/blocks/complex-component/lib/block-number\";\n\nexport function useBlockNumber() {\n    const [blockNumber, setBlockNumber] = useState(0);\n    const [unsub, setUnsub] = useState<(() => void) | null>(null);\n\n    const fetchBlockNumber = useCallback(async () => {\n        try {\n            const resp = await getBlockNumber((newBlockNumber) => {\n                setBlockNumber(newBlockNumber);\n            });\n\n            if (!resp) {\n                return;\n            }\n            setBlockNumber(resp.blockNumber);\n            setUnsub(() => resp.unsub);\n        } catch {\n            setBlockNumber(0);\n        }\n    }, [])\n\n    return {\n        blockNumber,\n        fetchBlockNumber,\n        unsub\n    };\n}",
       "type": "registry:hook"
     }
   ]
