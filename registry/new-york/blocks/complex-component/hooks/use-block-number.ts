@@ -1,31 +1,37 @@
 "use client"
 
-import { useCallback, useState } from "react";
-import { getBlockNumber } from "@/registry/new-york/blocks/complex-component/lib/block-number";
+import { useEffect, useState } from "react";
+import { useApiContext } from "../providers/api-provider";
 
 export function useBlockNumber() {
     const [blockNumber, setBlockNumber] = useState(0);
-    const [unsub, setUnsub] = useState<(() => void) | null>(null);
+    const [isLoading, setLoading] = useState(true);
+    const { api, legacy, apiReady } = useApiContext();
 
-    const fetchBlockNumber = useCallback(async () => {
-        try {
-            const resp = await getBlockNumber((newBlockNumber) => {
-                setBlockNumber(newBlockNumber);
-            });
-
-            if (!resp) {
-                return;
-            }
-            setBlockNumber(resp.blockNumber);
-            setUnsub(() => resp.unsub);
-        } catch {
-            setBlockNumber(0);
+    useEffect(() => {
+       let unsubscribe: any;
+       
+       (async () => {
+        const client = api || legacy;
+        if (!client) {
+            return;
         }
-    }, [])
+        
+        setLoading(true);
+
+        unsubscribe = await client.query.system.number((blockNumber: number) => {   
+            setBlockNumber(blockNumber);
+            setLoading(false);
+        });
+       })();
+
+        return () => {
+            unsubscribe && unsubscribe();
+        };
+    }, [api, apiReady, legacy]);
 
     return {
         blockNumber,
-        fetchBlockNumber,
-        unsub
+        isLoading,
     };
 }

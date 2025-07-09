@@ -24,6 +24,10 @@ This is a template for creating a custom registry using Next.js.
 - Registry component, hook, and lib files are stored in `/registry/new-york/blocks/complex-component/`.
 - Install the component via CLI using `shadcn add` command.
 
+## Additional packages to install
+- @coong/sdk
+- react-use
+
 ## Documentation
 
 Visit the [shadcn documentation](https://ui.shadcn.com/docs/registry) to view the full documentation.
